@@ -269,9 +269,9 @@ function enviarWA(id, est, e) {
     if(est === 'camino'){
         let f = new Date(e.fecha); f.setDate(f.getDate() + parseInt(e.dias));
         let fTxt = f.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
-        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, su pedido ya salió y está en ruta. 📦%0A%0A*Guía:* ${id}%0A*Estado:* En camino a ${e.destino}%0A*Fecha estimada:* ${fTxt}.%0A%0AConsulte aquí: www.transkarga.com %0A%0A*Transkarga By BHL Group*`;
+        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, su pedido ya salió de nuestras instalaciones y está en ruta de entrega. 📦✨%0A%0A*Número de Guía:* ${id}%0A*Estado:* En camino a ${e.destino}%0A*Fecha estimada:* recibirás aprox. el día ${fTxt} [fecha puede variar].%0A%0AConsulte su trazabilidad en tiempo real aquí: www.transkarga.com %0A%0A*Transkarga By BHL Group*%0A_"Conectando sueños, entregando confianza."_`;
     } else {
-        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, ¡su pedido ya está *EN DISTRIBUCIÓN*! 🏁📦%0A%0A*Guía:* ${id}%0A%0A*Transkarga By BHL Group*`;
+        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, ¡buenas noticias! Su pedido ya se encuentra *EN DISTRIBUCIÓN* y *será entregado Pronto*. 🏁📦%0A%0A*Número de Guía:* ${id}%0A*Recomendación:* Estar atento en la dirección y al teléfono.%0A%0A*Transkarga By BHL Group*%0A_"Conectando sueños, entregando confianza."_`;
     }
     window.open(`https://wa.me/57${e.telefono}?text=${msg}`);
 }
