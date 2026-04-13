@@ -1,0 +1,465 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transkarga | Prueba 31 Final Pro Cloud</title>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyApuFHtffhfCU5SSIY5WTx7FAmw2XmLyfk4",
+    authDomain: "transkarga-oficial.firebaseapp.com",
+    databaseURL: "https://transkarga-oficial-default-rtdb.firebaseio.com",
+    projectId: "transkarga-oficial",
+    storageBucket: "transkarga-oficial.firebasestorage.app",
+    messagingSenderId: "839281691842",
+    appId: "1:839281691842:web:17df00f12a89d479c7ff5b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Compartir funciones con el resto del código
+  window.db = db; window.ref = ref; window.set = set; window.onValue = onValue; window.update = update; window.remove = remove;
+
+  // Sincronización en tiempo real con la Nube
+  onValue(ref(db, 'guias'), (snapshot) => {
+    window.envios = snapshot.val() || {};
+    if(typeof listar === "function") listar();
+  });
+</script>
+
+<style>
+/* --- TUS ESTILOS BASE ORIGINALES SE MANTIENEN INTACTOS --- */
+html { scroll-behavior: smooth; }
+body{margin:0;font-family:'Segoe UI', sans-serif;background:#f4f6f9; overflow-x: hidden;}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 40px;background:linear-gradient(90deg,#1e4fa1,#2a6edb);color:white; position: sticky; top:0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+header img{height:50px}
+nav a{color:white;margin:0 15px;text-decoration:none; font-weight: 500; transition: 0.3s;}
+nav a:hover { color: #ff7a00; }
+.hero{height:600px;background:url('https://images.unsplash.com/photo-1601584115197-04ecc0da31d7') center/cover;display:flex;justify-content:center;align-items:center;}
+.box{background:rgba(255,255,255,0.95);padding:35px;border-radius:20px;color:#1e4fa1;width:450px;text-align:center;box-shadow:0 15px 35px rgba(0,0,0,0.2);}
+#loader { display: none; margin: 15px auto; width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid #ff7a00; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.resultado-rastreo { text-align: left; margin-top: 20px; background: #fdfdfd; padding: 20px; border-radius: 12px; border-left: 10px solid #ff7a00; box-shadow: 0 4px 15px rgba(0,0,0,0.05); animation: slideIn 0.4s ease; transition: 0.3s; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; }
+.toast { background: #333; color: white; padding: 12px 25px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid #ff7a00; }
+input, textarea{width:100%;padding:12px;margin-top:8px;border-radius:8px;border:2px solid #1e4fa1;box-sizing: border-box; font-weight: bold; color: #1e4fa1;}
+button{width:100%;padding:12px;margin-top:10px;background:#ff7a00;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition: 0.3s;}
+button:hover{background:#e66e00; transform: translateY(-3px);}
+.timeline{display:flex;justify-content:space-between;margin-top:40px;position:relative;}
+.timeline::before{content:'';position:absolute;top:15px;left:0;width:100%;height:4px;background:#eee;}
+.circle{width:32px;height:32px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;color:white;z-index:1; font-size: 14px; transition: 0.4s;}
+.active{background:#25D366; transform: scale(1.1); box-shadow: 0 0 10px rgba(37, 211, 102, 0.5);}
+#c1.active { animation: pulse 2s infinite; }
+#c2.active { animation: driving 0.3s infinite; }
+#c3.active { animation: bouncing 1s infinite; }
+#c4.active { animation: success 0.5s ease-out forwards; }
+@keyframes pulse { 0% { transform: scale(1.1); } 50% { transform: scale(1.2); } 100% { transform: scale(1.1); } }
+@keyframes driving { 0% { transform: translate(1px, 1px) rotate(0deg); } 50% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
+@keyframes bouncing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes success { 0% { transform: scale(0); } 70% { transform: scale(1.4); } 100% { transform: scale(1.1); } }
+.servicios{text-align:center;padding:80px 20px;background:#f8f9fa}
+.cards{display:flex;gap:20px;justify-content:center;flex-wrap:wrap; margin-top: 30px;}
+.card{background:white;padding:30px 15px;border-radius:15px;box-shadow:0 10px 20px rgba(0,0,0,0.05); width: 200px; transition: 0.4s; border-bottom: 4px solid transparent;}
+.card svg { width: 45px; height: 45px; stroke: #1e4fa1; fill: none; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+.contenedores{height:300px;background:linear-gradient(rgba(255, 255, 255, 0.2), rgba(30, 79, 161, 0.4)), url('https://images.unsplash.com/photo-1578575437130-527eed3abbec') center/cover fixed;display:flex;align-items:center;justify-content:center;color:white;font-size:32px;font-weight:bold; text-shadow: 2px 2px 15px rgba(0,0,0,0.7);}
+.nosotros{text-align:center;padding:100px 20px;background:white;}
+.frase-inspiradora { max-width: 850px; margin: 0 auto; font-size: 20px; line-height: 1.8; color: #444; font-style: italic; }
+.contacto{text-align:center;padding:120px 20px; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070') center/cover fixed; color:white}
+.dato-contacto { font-weight: 800; color: white; font-size: 22px; }
+.footer-brand { margin-top: 40px; font-size: 26px; font-weight: 900; color: #0047AB; text-transform: uppercase; letter-spacing: 3px; text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 2px 2px 0px rgba(0,0,0,0.2), 4px 4px 8px rgba(0,0,0,0.4); }
+.whatsapp-float-3d { position: fixed; width: 90px; height: 90px; bottom: 30px; right: 30px; background: radial-gradient(circle at 35% 35%, #25d366, #128c7e); border: 6px solid #bdc3c7; border-radius: 50%; box-shadow: inset 4px 4px 10px rgba(255,255,255,0.4), 0 10px 30px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.whatsapp-float-3d span.icon { font-size: 40px; }
+.whatsapp-float-3d span.label { position: absolute; bottom: -25px; width: 150px; text-align: center; font-size: 9px; font-weight: 900; color: #333; text-transform: uppercase; }
+.admin-btn { position:fixed; bottom:30px; left:30px; background:#333; color:white; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; cursor:pointer; border-radius:12px; z-index: 1000; font-size: 24px; transition: 0.4s; }
+.admin{display:none;position:fixed;top:10px;right:10px;background:white;padding:25px;width:370px;height:90vh;overflow-y:auto;border-radius:15px;box-shadow:0 10px 50px rgba(0,0,0,0.5);z-index: 2000; color: #333;}
+.stat-box { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; }
+.guia-card{border:1px solid #eee;padding:12px;margin-top:10px;border-radius:10px;background:#fdfdfd; font-size: 11px;}
+.modal-nota { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 3000; border-left: 8px solid #ff7a00; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2999; }
+</style>
+</head>
+
+<body>
+
+<div id="toast-container"></div>
+
+<header>
+<img src="logo.png" alt="Transkarga">
+<nav>
+<a href="#inicio">Inicio</a>
+<a href="#servicios">Servicios</a>
+<a href="#nosotros">Nosotros</a>
+<a href="#contacto">Contacto</a>
+</nav>
+</header>
+
+<div class="hero" id="inicio">
+<div class="box">
+<h2 style="margin-top:0;">Rastrea tu envío</h2>
+<input id="guia" placeholder="Número de guía (Ej: TK...)">
+<button onclick="buscar()">Consultar Estado</button>
+<div id="loader"></div>
+<div id="info"></div>
+<div class="timeline">
+<div><div class="circle" id="c1">✓</div><small>Creado</small></div>
+<div><div class="circle" id="c2">🚚</div><small>En camino</small></div>
+<div><div class="circle" id="c3">📦</div><small>Reparto</small></div>
+<div><div class="circle" id="c4">✔</div><small>Final</small></div>
+</div>
+</div>
+</div>
+
+<section class="servicios" id="servicios">
+<h2>Nuestros Servicios Especializados</h2>
+<div class="cards">
+    <div class="card"><svg viewBox="0 0 24 24"><path d="M21 10V8L15 2H5C3.89 2 3 2.89 3 4V20C3 21.11 3.89 22 5 22H21C22.11 22 23 21.11 23 20V12L21 10M14 4L19 9H14V4M5 20V4H12V10H18V20H5M7 14H16V16H7V14M7 11H11V13H7V11M7 17H13V19H7V17Z"/></svg><h3>Locales</h3><p>Urbana inmediata.</p></div>
+    <div class="card"><svg viewBox="0 0 24 24"><path d="M20,8H17V4H3C1.9,4 1,4.9 1,6V17H3A3,3 0 0,0 6,20A3,3 0 0,0 9,17H15A3,3 0 0,0 18,20A3,3 0 0,0 21,17H23V12L20,8M6,18.5A1.5,1.5 0 0,1 4.5,17A1.5,1.5 0 0,1 6,15.5A1.5,1.5 0 0,1 7.5,17A1.5,1.5 0 0,1 6,18.5M17,12V9.5H19.5L21.46,12H17M18,18.5A1.5,1.5 0 0,1 16.5,17A1.5,1.5 0 0,1 18,15.5A1.5,1.5 0 0,1 19.5,17A1.5,1.5 0 0,1 18,18.5Z"/></svg><h3>Nacionales</h3><p>Todo el país.</p></div>
+    <div class="card"><svg viewBox="0 0 24 24"><path d="M17.9,17.39C17.64,16.59 16.89,16 16,16H15V13A1,1 0 0,0 14,12H8V10H10A1,1 0 0,0 11,9V7H13A2,2 0 0,0 15,5V4.59C17.93,5.77 20,8.64 20,12C20,14.08 19.2,15.97 17.9,17.39M11,19.93C7.05,19.44 4,16.08 4,12C4,11.38 4.08,10.78 4.21,10.21L9,15V16A2,2 0 0,0 11,18V19.93M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg><h3>Internacionales</h3><p>Fronteras sin límites.</p></div>
+    <div class="card"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,17V16H9V14H13V13H10A2,2 0 0,1 8,11V9A2,2 0 0,1 10,7H11V6H13V7H15V9H11V10H14A2,2 0 0,1 16,12V14A2,2 0 0,1 14,16H13V17H11Z"/></svg><h3>Contra Entrega</h3><p>Cobro seguro.</p></div>
+</div>
+</section>
+
+<div class="contenedores">"Conectando sueños, entregando confianza"</div>
+
+<section class="nosotros" id="nosotros">
+<h2>Nuestra Inspiración</h2>
+<div class="frase-inspiradora">
+"En <b>Transkarga</b>, no solo transportamos mercancía; movemos los sueños y el esfuerzo de miles de emprendedores y familias colombianas. Nuestra misión nace en la carretera y se perfecciona en la confianza de cada entrega. Somos el puente que une distancias y el motor que impulsa el crecimiento del país, trabajando con integridad, pasión y una tecnología de vanguardia que nos permite estar siempre un paso adelante."
+</div>
+</section>
+
+<section class="contacto" id="contacto">
+<h2>Contacto Directo</h2>
+<div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+    <div class="dato-contacto">📞 3017317575</div>
+    <div class="dato-contacto">📧 contacto@transkarga.com</div>
+    <div class="dato-contacto">📍 Bogotá, Colombia</div>
+</div>
+<div class="footer-brand">Transkarga By BHL Group</div>
+</section>
+
+<a href="https://wa.me/573017317575" class="whatsapp-float-3d" target="_blank">
+    <span class="icon">💬</span>
+    <span class="label">Transkarga By BHL Group</span>
+</a>
+
+<div class="admin-btn" onclick="login()">⚙️</div>
+
+<div class="admin" id="panel">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<h3 id="t-form" style="margin:0">Gestión Nube</h3>
+<button onclick="cerrar()" style="background:none; color:red; border:none; cursor:pointer; font-size: 20px;">×</button>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:15px 0;">
+    <div class="stat-box"><b id="stat-total">0</b><br><small style="font-size:10px; color:gray;">Total Guías</small></div>
+    <div class="stat-box"><b id="stat-entregadas">0</b><br><small style="font-size:10px; color:gray;">Entregadas</small></div>
+</div>
+
+<p style="font-size:12px; color:gray; margin-top:10px;">Datos del Envío</p>
+<input id="cliente" placeholder="Nombre Cliente">
+<input id="origen" placeholder="Origen">
+<input id="destino" placeholder="Destino">
+<input id="dias" type="number" placeholder="Días estimados">
+<input id="telefono" placeholder="WhatsApp (Ej: 301...)">
+
+<button onclick="guardarGuia()" id="btn-main" style="background:#2ecc71">💾 Guardar en Nube</button>
+<button onclick="nuevaGuia()" style="background:#3498db">🆕 Limpiar</button>
+
+<hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+<input id="guiaAdmin" placeholder="Guía seleccionada" style="border: 2px solid #3498db;">
+
+<div style="display:flex; gap:5px">
+<button onclick="setEstadoWA('camino')" style="background:#3498db; font-size:11px">🚚 Camino</button>
+<button onclick="setEstadoWA('distribucion')" style="background:#ff9800; font-size:11px">📦 Reparto</button>
+</div>
+<input id="recibe" placeholder="¿Quién recibió?">
+<button onclick="setEstado('entregado')" style="background:#2ecc71">✅ Entregado</button>
+
+<hr>
+<input id="filtro" placeholder="Filtrar por nombre o guía..." onkeyup="filtrar()">
+<button onclick="bajarExcel()" style="background:#27ae60">📊 Reporte .xls</button>
+<div id="lista"></div>
+</div>
+
+<div class="modal-overlay" id="overlayNota"></div>
+<div class="modal-nota" id="modalNota">
+    <h3 style="color:#0047AB; margin-top:0;">Nota Interna</h3>
+    <textarea id="textoNota" rows="4"></textarea>
+    <button onclick="cerrarNota()" style="background:#ff7a00; margin-top:15px;">💾 Guardar</button>
+</div>
+
+<script>
+// LAS VARIABLES SE ALIMENTAN DE LA NUBE (window.envios)
+window.envios = {}; 
+let idEdit = null;
+let idNotaActual = null;
+
+function notify(text) {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerText = text;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+
+function updateStats() {
+    let keys = Object.keys(window.envios);
+    document.getElementById("stat-total").innerText = keys.length;
+    document.getElementById("stat-entregadas").innerText = keys.filter(k => window.envios[k].estado === 'entregado').length;
+}
+
+function login(){ if(prompt("Clave:") === "Transkarga2024"){ document.getElementById("panel").style.display="block"; listar(); } }
+function cerrar(){ document.getElementById("panel").style.display="none"; }
+
+function nuevaGuia(){
+    idEdit = null;
+    ["cliente","telefono","origen","destino","dias","guiaAdmin","recibe"].forEach(id => {
+        document.getElementById(id).value="";
+    });
+    document.getElementById("t-form").innerText="Nueva Guía";
+}
+
+// FUNCIÓN DE GUARDADO EN NUBE
+function guardarGuia(){
+    let c=document.getElementById("cliente"), t=document.getElementById("telefono"), o=document.getElementById("origen"), d=document.getElementById("destino"), ds=document.getElementById("dias");
+    if(!c.value.trim() || !o.value.trim() || !d.value.trim()){ notify("⚠️ Faltan datos esenciales"); return; }
+    
+    let id = idEdit || "TK" + Date.now().toString().slice(-6);
+    let data = {
+        cliente: c.value, 
+        telefono: t.value, 
+        origen: o.value, 
+        destino: d.value, 
+        dias: ds.value, 
+        fecha: window.envios[id]?.fecha || Date.now(), 
+        estado: window.envios[id]?.estado || "creado", 
+        historial: window.envios[id]?.historial || [{e:"creado", f:Date.now()}], 
+        nota: window.envios[id]?.nota || ""
+    };
+
+    window.set(window.ref(window.db, 'guias/' + id), data).then(() => {
+        document.getElementById("guiaAdmin").value = id;
+        notify("✅ Guía " + id + " sincronizada en la nube.");
+    });
+}
+
+function setEstadoWA(est){
+    let id = document.getElementById("guiaAdmin").value.toUpperCase().trim();
+    if(!window.envios[id]){ notify("❌ Guía no encontrada"); return; }
+    let e = window.envios[id];
+    let hist = e.historial || [];
+    hist.push({e: est, f: Date.now()});
+
+    window.update(window.ref(window.db, 'guias/' + id), { estado: est, historial: hist }).then(() => {
+        notify("🚀 Estado: " + est.toUpperCase());
+        enviarWA(id, est, e);
+    });
+}
+
+function enviarWA(id, est, e) {
+    let msg = "";
+    if(est === 'camino'){
+        let f = new Date(e.fecha); f.setDate(f.getDate() + parseInt(e.dias));
+        let fTxt = f.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, su pedido ya salió y está en ruta. 📦%0A%0A*Guía:* ${id}%0A*Estado:* En camino a ${e.destino}%0A*Fecha estimada:* ${fTxt}.%0A%0AConsulte aquí: www.transkarga.com %0A%0A*Transkarga By BHL Group*`;
+    } else {
+        msg = `Cordial saludo *${e.cliente.toUpperCase()}*, ¡su pedido ya está *EN DISTRIBUCIÓN*! 🏁📦%0A%0A*Guía:* ${id}%0A%0A*Transkarga By BHL Group*`;
+    }
+    window.open(`https://wa.me/57${e.telefono}?text=${msg}`);
+}
+
+function setEstado(est){
+    let id = document.getElementById("guiaAdmin").value.toUpperCase().trim();
+    if(!window.envios[id]){ notify("❌ Guía no encontrada"); return; }
+    
+    let updateData = { estado: est };
+    let hist = window.envios[id].historial || [];
+    hist.push({e: est, f: Date.now()});
+    updateData.historial = hist;
+
+    if(est==='entregado') {
+        updateData.recibe = document.getElementById("recibe").value;
+        updateData.fechaEntregaReal = Date.now();
+    }
+
+    window.update(window.ref(window.db, 'guias/' + id), updateData).then(() => {
+        notify("🚀 Estado: " + est.toUpperCase());
+    });
+}
+
+function listar(){
+    let div = document.getElementById("lista"); 
+    div.innerHTML = "";
+    
+    // 1. Convertimos el objeto de la nube en una lista (Array)
+    let listaGuias = [];
+    for(let id in window.envios) {
+        listaGuias.push({ id: id, ...window.envios[id] });
+    }
+
+    // 2. Ordenamos: la fecha más grande (más reciente) va primero
+    listaGuias.sort((a, b) => {
+        const fechaA = a.fecha || 0;
+        const fechaB = b.fecha || 0;
+        return fechaB - fechaA;
+    });
+
+    // 3. Dibujamos la lista ya ordenada
+    listaGuias.forEach(e => {
+        let id = e.id;
+        div.innerHTML += `<div class="guia-card">
+            <div style="display:flex; justify-content:space-between;"><b>${id}</b> [${e.estado}]</div>
+            ${e.cliente} | ${e.destino}
+            <div style="margin-top:5px; display:flex; gap:3px;">
+                <button onclick="editar('${id}')" style="background:#f39c12; font-size:9px; width:auto; padding:3px 6px; margin:0;">Editar</button>
+                <button onclick="eliminarGuia('${id}')" style="background:#e74c3c; font-size:9px; width:auto; padding:3px 6px; margin:0;">Borrar</button>
+                <button onclick="abrirNota('${id}')" style="background:#556b2f; font-size:9px; width:auto; padding:3px 6px; margin:0;">🗨️ Nota</button>
+            </div>
+        </div>`;
+    });
+    updateStats();
+}
+
+function abrirNota(id){
+    idNotaActual = id;
+    document.getElementById("textoNota").value = window.envios[id].nota || "";
+    document.getElementById("overlayNota").style.display = "block";
+    document.getElementById("modalNota").style.display = "block";
+}
+
+function cerrarNota(){
+    if(idNotaActual){
+        window.update(window.ref(window.db, 'guias/' + idNotaActual), { nota: document.getElementById("textoNota").value });
+    }
+    document.getElementById("overlayNota").style.display = "none";
+    document.getElementById("modalNota").style.display = "none";
+}
+
+function eliminarGuia(id){
+    if(confirm("🗑️ ¿Borrar de la nube guía " + id + "?")){
+        window.remove(window.ref(window.db, 'guias/' + id));
+    }
+}
+
+function editar(id){
+    idEdit = id; let e = window.envios[id];
+    document.getElementById("cliente").value=e.cliente; document.getElementById("telefono").value=e.telefono||""; 
+    document.getElementById("origen").value=e.origen; document.getElementById("destino").value=e.destino; 
+    document.getElementById("dias").value=e.dias; document.getElementById("guiaAdmin").value=id;
+}
+
+// --- INTERFAZ DEL CLIENTE DETALLADA (RECUERDA TODO LO QUE PIDIERON) ---
+function buscar(){
+    let id = document.getElementById("guia").value.toUpperCase().trim();
+    let res = document.getElementById("info");
+    let loader = document.getElementById("loader");
+    res.innerHTML = ""; loader.style.display = "block";
+
+    setTimeout(() => {
+        loader.style.display = "none";
+        if(window.envios[id]){
+            let e = window.envios[id];
+            let hoy = new Date(); hoy.setHours(0,0,0,0);
+            let creacion = new Date(e.fecha); creacion.setHours(0,0,0,0);
+            let diasPasados = Math.floor((hoy - creacion) / (1000*60*60*24));
+            let restantes = Math.max(e.dias - diasPasados, 0);
+
+            let txtFechaTitulo = "Entrega estimada:";
+            let fechaMostrar = "";
+
+            if(e.estado === 'entregado') {
+                txtFechaTitulo = "Fecha de entrega:";
+                let fechaEnt = new Date(e.fechaEntregaReal || e.fecha);
+                fechaMostrar = fechaEnt.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+                restantes = 0;
+            } else {
+                let fechaEst = new Date(creacion.getTime() + (e.dias * 24*60*60*1000));
+                fechaMostrar = fechaEst.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
+            }
+
+            let txtEstado = e.estado.toUpperCase();
+            if(txtEstado === "CAMINO") txtEstado = "EN CAMINO";
+            if(txtEstado === "DISTRIBUCION") txtEstado = "EN DISTRIBUCION";
+
+            let histHTML = e.historial.map(h => {
+                let txtH = h.e.toUpperCase();
+                if(txtH === "CAMINO") txtH = "EN CAMINO";
+                if(txtH === "DISTRIBUCION") txtH = "EN DISTRIBUCION";
+                return `<li>• ${txtH}: ${new Date(h.f).toLocaleString()}</li>`;
+            }).join("");
+
+            res.innerHTML = `<div class="resultado-rastreo" style="color: #1e4fa1;">
+                <h3 style="margin-bottom:5px;">Estado: ${txtEstado}</h3>
+                <p style="margin:2px 0;">👤 <b>Cliente:</b> ${e.cliente}</p>
+                <p style="margin:2px 0;">📍 <b>Ruta:</b> ${e.origen} ➔ ${e.destino}</p>
+                <p style="margin:2px 0;">🗓️ <b>${txtFechaTitulo}</b> ${fechaMostrar}</p>
+                ${e.estado !== 'entregado' ? `<p style="margin:2px 0;">⏳ <b>Días restantes:</b> ${restantes} días</p>` : ""}
+                ${e.recibe ? `<p style="margin:5px 0; color:green;">✅ <b>Recibió:</b> ${e.recibe}</p>` : ""}
+                <hr style="margin:10px 0; border:0; border-top:1px solid #ddd;">
+                <b style="font-size:13px;">Historial de Movimientos:</b>
+                <ul style="padding-left:15px; font-size:11px; margin-top:5px; color:#444; list-style:none;">${histHTML}</ul>
+            </div>`;
+            
+            let n = e.estado === 'entregado' ? 4 : (e.estado === 'distribucion' ? 3 : (e.estado === 'camino' ? 2 : 1));
+            pintar(n);
+        } else { res.innerHTML = "<p style='color:red; margin-top:10px;'>❌ Guía no encontrada.</p>"; pintar(0); }
+    }, 600);
+}
+
+function pintar(n){ [c1,c2,c3,c4].forEach((c,i) => { c.classList.remove("active"); if(i < n) c.classList.add("active"); }); }
+
+function filtrar(){
+    let val = document.getElementById("filtro").value.toUpperCase();
+    document.querySelectorAll(".guia-card").forEach(c => c.style.display = c.innerText.toUpperCase().includes(val) ? "block" : "none");
+}
+
+function bajarExcel(){
+    let t = `<table border="1">
+        <tr>
+            <th>Guia</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Nota</th>
+            <th>Recibio</th>
+            <th>Fecha Entrega</th>
+        </tr>`;
+    
+    for(let id in window.envios) {
+        let e = window.envios[id];
+        
+        // Convertir la fecha de entrega a un formato legible si existe
+        let fechaEntTxt = "";
+        if(e.fechaEntregaReal) {
+            let f = new Date(e.fechaEntregaReal);
+            fechaEntTxt = f.toLocaleDateString() + " " + f.toLocaleTimeString();
+        } else if (e.estado === 'entregado' && e.fecha) {
+            // Respaldo por si no tiene fechaEntregaReal pero sí fecha base
+            let f = new Date(e.fecha);
+            fechaEntTxt = f.toLocaleDateString();
+        }
+
+        t += `<tr>
+            <td>${id}</td>
+            <td>${e.cliente}</td>
+            <td>${e.estado}</td>
+            <td>${e.nota || ""}</td>
+            <td>${e.recibe || ""}</td>
+            <td>${fechaEntTxt}</td>
+        </tr>`;
+    }
+    t += `</table>`;
+    
+    // Abrir el archivo en Excel
+    window.open('data:application/vnd.ms-excel,' + encodeURIComponent(t));
+}
+</script>
+</body>
+</html>
